@@ -1,6 +1,8 @@
 import os
 import arcpy
 import csv
+import FieldCheck
+
 from xml.etree.ElementTree import ElementTree  
 from query_yes_no import query_yes_no
 
@@ -8,7 +10,7 @@ class SDEReview(object):
     
     def __init__(self, connectionString, output):
         arcpy.env.workspace = connectionString
-        arcpy.env.scratchWorkspace = os.path.dirname(os.path.realpath(__file__))
+        arcpy.env.scratchWorkspace = os.path.dirname(os.path.realpath(__file__)) + "scratch"
         self._output = output
         
         desc = arcpy.Describe(arcpy.env.workspace)
@@ -48,6 +50,8 @@ class SDEReview(object):
         fields = arcpy.ListFields(featureClass)
         for field in fields:
             print field.name
+            camelCaseResults = FieldCheck.VerifyCamelCase(field.name)
+            print camelCaseResults
         
         self._isCamelCased = query_yes_no("Are you satisfied that these fields are camel cased? Y/N")
         
@@ -83,27 +87,33 @@ class SDEReview(object):
         
         pointOfContactElement = "{http://www.isotc211.org/2005/gmd}identificationInfo/{http://www.isotc211.org/2005/gmd}MD_DataIdentification/{http://www.isotc211.org/2005/gmd}pointOfContact/{http://www.isotc211.org/2005/gmd}CI_ResponsibleParty/{http://www.isotc211.org/2005/gmd}individualName/{http://www.isotc211.org/2005/gco}CharacterString"
         pointOfContact = root.find(pointOfContactElement)
+
+        if hasattr(title, "text") and + \
+                 hasattr(summary, "text") and  + \
+                 hasattr(constraints, "text") and  + \
+                 hasattr(lastUpdated, "text") and  + \
+                 hasattr(updateFrequency, "attrib") and  + \
+                 hasattr(pointOfContact, "text"):
+
+            this._hasMetadata = "Yes"
         
-        hasMetadata = (hasattr(title, "text") AND hasattr(summary, "text") AND hasattr(constraints, "text") AND hasattr(lastUpdated, "text") AND hasattr(updateFrequency, "attrib") AND hasattr(pointOfContact, "text"))
-        
-        if has:
-        
-            self._hasMetadata = "Yes"
+        elif hasattr(title, "text") or + \
+                 hasattr(summary, "text") or  + \
+                 hasattr(constraints, "text") or  + \
+                 hasattr(lastUpdated, "text") or  + \
+                 hasattr(updateFrequency, "attrib") or  + \
+                 hasattr(pointOfContact, "text"):
+
+            this._hasMetadata = "Partial"
             
-        elif hasattr(title, "text") OR hasattr(summary, "text") OR hasattr(constraints, "text") OR hasattr(lastUpdated, "text") OR hasattr(updateFrequency, "attrib") OR hasattr(pointOfContact, "text"):
-            
-            self._hasMetadata = "Partial"
-                
         else:
-            
-            self._hasMetadata = "NO"
-       
-        print("Has Metadata: " self._hasMetadata)
+
+            this._hasMetadata = "No"
         
         xmlFile.close()
         os.remove(xmlOutputPath)
             
-        
+    
     def _reviewFeatureDatasets(self):
         
         self._listFeatureDatasets()
