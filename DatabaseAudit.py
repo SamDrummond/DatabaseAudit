@@ -52,12 +52,17 @@ class SDEReview(object):
         
         for field in fields:
 
-            verifyCamelCase = FieldCheck.VerifyCamelCase(field.name)
-            camelCaseResults = verifyCamelCase.isCamelCased()
-            print field.name + ": " + str(camelCaseResults)
+            if not (field.name.lower() == "OBJECTID".lower()
+                    or field.name.lower() == "SHAPE.STArea()".lower()
+                    or field.name.lower() == "SHAPE.STLength()".lower()
+                    or field.name.lower() == "SHAPE".lower()):
             
-            if not camelCaseResults:
-                self._isCamelCased = "No"
+                verifyCamelCase = FieldCheck.VerifyCamelCase(field.name)
+                camelCaseResults = verifyCamelCase.isCamelCased()
+                print field.name + ": " + str(camelCaseResults)
+            
+                if not camelCaseResults:
+                    self._isCamelCased = "No"
             
         
         
@@ -159,7 +164,7 @@ class SDEReview(object):
             
             self._results.append(featureClassRecord)
 
-    def _generateOutputCSV():
+    def _generateOutputCSV(self):
         
         outputFileCSV = open(self._output, 'wb')
         wr = csv.writer(outputFileCSV, quoting=csv.QUOTE_ALL)
