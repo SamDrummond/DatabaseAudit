@@ -9,7 +9,7 @@ class SDEReview(object):
     
     def __init__(self, connectionString, output):
         arcpy.env.workspace = connectionString
-        arcpy.env.scratchWorkspace = os.path.dirname(os.path.realpath(__file__)) + "scratch"
+        arcpy.env.scratchWorkspace = os.path.dirname(os.path.realpath(__file__)) + "\\scratch"
         self._output = output
         
         desc = arcpy.Describe(arcpy.env.workspace)
@@ -18,7 +18,7 @@ class SDEReview(object):
         
         dir = arcpy.GetInstallInfo("desktop")["InstallDir"]
         self._metadataTranslator = dir + "Metadata/Translator/ESRI_ISO2ISO19139.xml"
-        
+        print self._metadataTranslator
         self._results = []
         
         print '### Welcome to SDE Review ###'
@@ -51,9 +51,10 @@ class SDEReview(object):
         self._isCamelCased = "Yes"
         
         for field in fields:
-            
-            camelCaseResults = FieldCheck.VerifyCamelCase(field.name)
-            print field.name + ": " + camelCaseResults
+
+            verifyCamelCase = FieldCheck.VerifyCamelCase(field.name)
+            camelCaseResults = verifyCamelCase.isCamelCased()
+            print field.name + ": " + str(camelCaseResults)
             
             if not camelCaseResults:
                 self._isCamelCased = "No"
@@ -100,7 +101,7 @@ class SDEReview(object):
                  hasattr(updateFrequency, "attrib") and  + \
                  hasattr(pointOfContact, "text"):
 
-            this._hasMetadata = "Yes"
+            self._hasMetadata = "Yes"
         
         elif hasattr(title, "text") or + \
                  hasattr(summary, "text") or  + \
@@ -109,11 +110,11 @@ class SDEReview(object):
                  hasattr(updateFrequency, "attrib") or  + \
                  hasattr(pointOfContact, "text"):
 
-            this._hasMetadata = "Partial"
+            self._hasMetadata = "Partial"
             
         else:
 
-            this._hasMetadata = "No"
+            self._hasMetadata = "No"
         
         xmlFile.close()
         os.remove(xmlOutputPath)
