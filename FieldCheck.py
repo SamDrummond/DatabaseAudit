@@ -3,50 +3,54 @@ class VerifyCamelCase(object):
     def __init__(self, fieldName):
         
         self._fieldName = fieldName
-        self._results = []
-         
-        self._isFirstCharacterLowerCase()
-        self._isLikelySingleWord()
-        self._isLikelyEntirelyAcronym()
-        self._hasUnderscores()
-        self._hasSpaces()
         
     def isCamelCased(self):
         
-        return self._results;
+        isCamelCased = True
         
-    def _isFirstCharacterLowerCase(self):
+        if self._hasUnderscores() or self._hasSpaces():
+            isCamelCased = False
+        elif self._isFirstCharacterLowerCase():
+            
+            isCamelCased =  self._isMixedCase() or self._isLikelyASingleWord()
+            
+        else:
+            
+            if self._isMixedCase():
+                
+                isCamelCased = self._isLikelyStartingWithAcronym()
+            
+            else: #its entirely upper case
+
+                isCamelCased = self._isLikelyFieldIsEntirelyAcronym()
         
-        firstCharacter = self._fieldName[0]
-        self._results.append(firstCharacter.islower())
-        
-    def _isLikelySingleWord(self):
-        
-        isEntirelyLowerCase = self._fieldName.islower()
-        
-        self._results.append(isEntirelyLowerCase and self._isShortFieldName())
-    
-    def _isLikelyEntirelyAcronym(self):
-        
-        isEntirelyUpperCase = self._fieldName.isupper()
-        self._results.append(isEntirelyUpperCase and self._isVeryShortFieldName())
+        return isCamelCased
         
     def _hasUnderscores(self):
         
-        hasUnderscores = "_" not in self._fieldName
-        self._results.append(hasUnderscores)
+        return ("_" in self._fieldName)
         
     def _hasSpaces(self):
         
-        hasSpaces = " " not in self._fieldName
-        self._results.append(hasSpaces)
+        return (" " in self._fieldName)
+        
+    def _isFirstCharacterLowerCase(self):
+        
+        return self._fieldName[0].islower()
+        
+    def _isMixedCase(self):
+        
+        return (not self._fieldName.islower()) and (not self._fieldName.isupper())
     
-    def _isShortFieldName(self):
+    def _isLikelyASingleWord(self):
         
         return (len(self._fieldName) <= 10)
-        
-    def _isVeryShortFieldName(self):
     
-        return (len(self._fieldName) <= 5)
+    def _isLikelyStartingWithAcronym(self):
+        return self._fieldName[1].isupper() 
+        
+    def _isLikelyFieldIsEntirelyAcronym(self):
+        return (len(self._fieldName) <= 4)
+    
         
         

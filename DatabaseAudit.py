@@ -4,7 +4,6 @@ import csv
 import FieldCheck
 
 from xml.etree.ElementTree import ElementTree  
-from query_yes_no import query_yes_no
 
 class SDEReview(object):
     
@@ -28,7 +27,7 @@ class SDEReview(object):
         
         raw_input('Hit any key to continue.')
         
-        ##self._reviewFeatureDatasets()
+        self._reviewFeatureDatasets()
         self._reviewFeatureClassesWithoutFeatureDatasets()
         
         self._generateOutputCSV()
@@ -48,12 +47,18 @@ class SDEReview(object):
         
         print("Review Fields:")
         fields = arcpy.ListFields(featureClass)
-        for field in fields:
-            print field.name
-            camelCaseResults = FieldCheck.VerifyCamelCase(field.name)
-            print camelCaseResults
         
-        self._isCamelCased = query_yes_no("Are you satisfied that these fields are camel cased? Y/N")
+        self._isCamelCased = "Yes"
+        
+        for field in fields:
+            
+            camelCaseResults = FieldCheck.VerifyCamelCase(field.name)
+            print field.name + ": " + camelCaseResults
+            
+            if not camelCaseResults:
+                self._isCamelCased = "No"
+            
+        
         
     def _reviewMetadata(self, featureClass):
         
