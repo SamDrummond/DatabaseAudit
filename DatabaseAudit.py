@@ -145,14 +145,18 @@ class SDEReview(object):
     def _reviewFeatureClasses(self, featureClasses):
         for featureClass in featureClasses:
             print("Feature Class name: " + featureClass)
-
-            self._areFieldsCamelCased(featureClass);
-            self._reviewMetadata(featureClass);
             
+            if arcpy.Exists(featureClass):
+                self._areFieldsCamelCased(featureClass);
+                self._reviewMetadata(featureClass);
+            else:
+                self._hasMetadata = "Unknown"
+                self._isCamelCased = "Unknown"
+        
             featureClassNameList = featureClass.split(".")
             self._currentSchema = featureClassNameList[1]
             tidyFeatureClassName = featureClassNameList[2]
-            
+        
             featureClassRecord = [
                 self._databaseName,
                 self._currentSchema,
@@ -161,6 +165,7 @@ class SDEReview(object):
                 self._isCamelCased,
                 self._hasMetadata
             ]
+                
             
             self._results.append(featureClassRecord)
 
