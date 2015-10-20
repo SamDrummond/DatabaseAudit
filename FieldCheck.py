@@ -1,56 +1,52 @@
 class VerifyCamelCase(object):
     
-    def __init__(self, fieldName):
+    def __init__(self, field_name):
         
-        self._fieldName = fieldName
+        self._field_name = field_name
         
-    def isCamelCased(self):
+    def is_camel_cased(self):
         
-        isCamelCased = True
+        is_camel_cased = True
         
-        if self._hasUnderscores() or self._hasSpaces():
-            isCamelCased = False
-        elif self._isFirstCharacterLowerCase():
-            
-            isCamelCased =  self._isMixedCase() or self._isLikelyASingleWord()
+        if self._has_underscores() or self._has_spaces():
+            is_camel_cased = False
+
+        elif self._is_first_character_lower_case():
+            is_camel_cased = self._is_mixed_case() or self._is_likely_single_word()
             
         else:
             
-            if self._isMixedCase():
-                
-                isCamelCased = self._isLikelyStartingWithAcronym()
-            
-            else: #its entirely upper case
+            if self._is_mixed_case():
+                is_camel_cased = self._is_likely_starting_with_acronym()
 
-                isCamelCased = self._isLikelyFieldIsEntirelyAcronym()
+            # Its entirely upper case
+            else:
+                is_camel_cased = self._is_likely_field_is_entirely_acronym()
         
-        return isCamelCased
+        return is_camel_cased
+
+    def _has_underscores(self):
         
-    def _hasUnderscores(self):
+        return "_" in self._field_name
         
-        return ("_" in self._fieldName)
+    def _has_spaces(self):
         
-    def _hasSpaces(self):
+        return " " in self._field_name
         
-        return (" " in self._fieldName)
+    def _is_first_character_lower_case(self):
         
-    def _isFirstCharacterLowerCase(self):
+        return self._field_name[0].islower()
         
-        return self._fieldName[0].islower()
+    def _is_mixed_case(self):
         
-    def _isMixedCase(self):
-        
-        return (not self._fieldName.islower()) and (not self._fieldName.isupper())
+        return (not self._field_name.islower()) and (not self._field_name.isupper())
     
-    def _isLikelyASingleWord(self):
-        
-        return (len(self._fieldName) <= 10)
+    def _is_likely_single_word(self):
+
+        return len(self._field_name) <= 10
     
-    def _isLikelyStartingWithAcronym(self):
-        return self._fieldName[1].isupper() 
+    def _is_likely_starting_with_acronym(self):
+        return self._field_name[1].isupper()
         
-    def _isLikelyFieldIsEntirelyAcronym(self):
-        return (len(self._fieldName) <= 4)
-    
-        
-        
+    def _is_likely_field_is_entirely_acronym(self):
+        return len(self._field_name) <= 4
